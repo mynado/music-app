@@ -5,29 +5,39 @@
 const resultCardsEl = document.querySelector('#result-cards');
 const searchFormEl = document.querySelector('#search-form');
 const searchEl = document.querySelector('#search');
+const artistCheckboxEl = document.querySelector('#artist');
+const albumCheckboxEl = document.querySelector('#album');
+const trackCheckboxEl = document.querySelector('#track');
 
 
 // Get value from input field
-let searchUrl = "https://deezerdevs-deezer.p.rapidapi.com/search?q=";
-let url = searchUrl + searchEl.value.split('-');
+let searchUrl;
+let url;
+const getUrl = (checkedUrl) => {
+    console.log("checkedUrl", checkedUrl);
+    searchUrl = checkedUrl;
+    url = searchUrl + searchEl.value.split('-');
+    console.log(url)
+};
 
- const getSongs = async (url) => {
+
+const getMusic = async (url) => {
     const response = await fetch(url, {
-	"method": "GET",
-	"headers": {
-		"x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
-		"x-rapidapi-key": "79e8812e73msh8da75390c6b6b51p184777jsn86eb54cfc71a"
-	}
+        "method": "GET",
+        "headers": {
+            "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
+            "x-rapidapi-key": "0428f3ba20msh040c736c17f91cfp145ccajsn9fc130114d20"
+        }
     });
     if (!response.ok) {
         throw new Error("Response was not OK.");
-    }
+    } 
    
     return await response.json();
-}
+};
 
 const renderSearchResults = (results) => {
-    
+
     results.data.forEach(result => {
         const resultHTML = `
             <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
@@ -37,21 +47,49 @@ const renderSearchResults = (results) => {
                         <h5 class="card-title">${result.title}</h5>
                         <h6>Artist: ${result.artist.name}</h6>
                         <h6>Album: ${result.album.title}</h6>
-                        <p class="card-text">The younger sister of R&B diva Beyoncé, Solange Knowles started just as early as a performer...</p>
+                        
                     </div>
                 </div>
             </div>
         `;
         resultCardsEl.innerHTML += resultHTML;
     });
+
 };
+
 
 searchFormEl.addEventListener('submit', function(e) {
     e.preventDefault();
+    // empty inputfield  and search result
     url = searchUrl + searchEl.value;
     resultCardsEl.innerHTML = "";
-    getSongs(url).then(renderSearchResults).catch(err => {
-        alert("Error getting artist. Error was: " + err);
-    });
+    
+    // check if the checkbox are checked
+    if (albumCheckboxEl.checked && artistCheckboxEl.checked && trackCheckboxEl.checked) {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=");
+        getMusic(url).then(renderSearchResults).catch(err => {
+            alert("Error getting search result. Error was: " + err);
+        });
+    } else if (artistCheckboxEl.checked) {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=artist:");
+        getMusic(url).then(renderSearchResults).catch(err => {
+            alert("Error getting search result. Error was: " + err);
+        });
+    } else if (albumCheckboxEl.checked) {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=album:");
+        getMusic(url).then(renderSearchResults).catch(err => {
+            alert("Error getting search result. Error was: " + err);
+        });
+    } else if (trackCheckboxEl.checked) {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=track:");
+        getMusic(url).then(renderSearchResults).catch(err => {
+            alert("Error getting search result. Error was: " + err);
+        });
+    } else {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=");
+        getMusic(url).then(renderSearchResults).catch(err => {
+            alert("Error getting search result. Error was: " + err);
+        });
+    }
 });
 
