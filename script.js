@@ -16,7 +16,7 @@ let url;
 const getUrl = (checkedUrl) => {
     console.log("checkedUrl", checkedUrl);
     searchUrl = checkedUrl;
-    url = searchUrl + searchEl.value.split('-');
+    url = searchUrl + searchEl.value; //.split('').join(' ') ifall jag vill lägga till dash mellan orden (-)
     console.log(url)
 };
 
@@ -52,11 +52,83 @@ const renderSearchResults = (results) => {
                 </div>
             </div>
         `;
+        console.log(result);
         resultCardsEl.innerHTML += resultHTML;
     });
-
 };
 
+const renderArtistResults = (results) => {
+    results.data.forEach(result => {
+        const resultHTML = `
+            <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
+                <div class="card">
+                    <img src="${result.picture_big}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">${result.name}</h5>
+                        <h6>Fans: ${result.nb_fan}</h6>
+                        <h6>Album: ${result.nb_album}</h6>
+                    </div>
+                </div>
+            </div>
+        `;
+        console.log(result);
+        return resultCardsEl.innerHTML += resultHTML;
+    });
+};
+
+
+const renderAlbumResults = (results) => {
+    results.data.forEach(result => {
+        const resultHTML = `
+            <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
+                <div class="card">
+                    <img src="${result.cover_big}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">${result.title}</h5>
+                        <h6>Artist: ${result.artist.name}</h6>
+                        
+                    </div>
+                </div>
+            </div>
+        `;
+        console.log(result.id);
+        return resultCardsEl.innerHTML += resultHTML;
+    });
+};
+
+
+
+const renderTrackResults = (results) => {
+    results.data.forEach(result => {
+        const resultHTML = `
+            <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
+                <div class="card">
+                    <img src="${result.album.cover_big}" class="card-img-top" alt="...">
+                    <audio controls>
+                            <source src="${result.preview}" type="audio/mpeg">
+                        </audio>
+                    <div class="card-body">
+                        <h5 class="card-title">${result.title}</h5>
+                        <h6>${result.artist.name}</h6>
+                        <p>${result.album.title}</p>
+                        <p>${Math.floor(result.duration / 60)} min ${result.duration % 60} sec</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        console.log(result);
+        return resultCardsEl.innerHTML += resultHTML;
+    });
+};
+
+
+
+
+const getID = (results) => {
+    results.data.forEach(result => {
+        console.log(result.album.id);
+    });
+};
 
 searchFormEl.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -71,18 +143,19 @@ searchFormEl.addEventListener('submit', function(e) {
             alert("Error getting search result. Error was: " + err);
         });
     } else if (artistCheckboxEl.checked) {
-        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=artist:");
-        getMusic(url).then(renderSearchResults).catch(err => {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search/artist?q=");
+        getMusic(url).then(renderArtistResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         });
     } else if (albumCheckboxEl.checked) {
-        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=album:");
-        getMusic(url).then(renderSearchResults).catch(err => {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search/album?q=");
+        getMusic(url).then(renderAlbumResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         });
+        
     } else if (trackCheckboxEl.checked) {
         getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=track:");
-        getMusic(url).then(renderSearchResults).catch(err => {
+        getMusic(url).then(renderTrackResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         });
     } else {
