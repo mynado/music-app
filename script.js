@@ -8,16 +8,18 @@ const searchEl = document.querySelector('#search');
 const artistCheckboxEl = document.querySelector('#artist');
 const albumCheckboxEl = document.querySelector('#album');
 const trackCheckboxEl = document.querySelector('#track');
+const tracklistEl = document.querySelector('#tracklist');
 
 
 // Get value from input field
 let searchUrl;
 let url;
+let tracklistUrl;
 const getUrl = (checkedUrl) => {
     console.log("checkedUrl", checkedUrl);
     searchUrl = checkedUrl;
     url = searchUrl + searchEl.value; //.split('').join(' ') ifall jag vill lägga till dash mellan orden (-)
-    console.log(url)
+    console.log("url", url)
 };
 
 
@@ -52,7 +54,6 @@ const renderSearchResults = (results) => {
                 </div>
             </div>
         `;
-        console.log(result);
         resultCardsEl.innerHTML += resultHTML;
     });
 };
@@ -71,13 +72,29 @@ const renderArtistResults = (results) => {
                 </div>
             </div>
         `;
-        console.log(result);
         return resultCardsEl.innerHTML += resultHTML;
     });
 };
 
+const getTracklistUrl = (checkedUrl) => {
+    tracklistUrl = checkedUrl;
+    console.log("tracklistUrl", tracklistUrl)
+};
+
+const renderTracklist = (tracks) => {
+    tracks.data.forEach(track => {
+        const trackHTML = `
+        <li>${track.title}</li>
+        `;
+        console.log(trackHTML);
+        return tracklistEl.innerHTML += trackHTML;
+    });
+};
+
+
 
 const renderAlbumResults = (results) => {
+    
     results.data.forEach(result => {
         const resultHTML = `
             <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
@@ -86,15 +103,19 @@ const renderAlbumResults = (results) => {
                     <div class="card-body">
                         <h5 class="card-title">${result.title}</h5>
                         <h6>Artist: ${result.artist.name}</h6>
-                        
+                        <h6>Tracklist: </h6>
+                        <ol id="tracklist"></ol>
                     </div>
                 </div>
             </div>
-        `;
-        console.log(result.id);
-        return resultCardsEl.innerHTML += resultHTML;
+        `; 
+        resultCardsEl.innerHTML += resultHTML;
+        getTracklistUrl("https://deezerdevs-deezer.p.rapidapi.com/album/" + result.id + "/tracks");
+        getMusic(tracklistUrl).then(renderTracklist).catch(err => err);
+        
     });
 };
+
 
 
 
@@ -116,17 +137,7 @@ const renderTrackResults = (results) => {
                 </div>
             </div>
         `;
-        console.log(result);
         return resultCardsEl.innerHTML += resultHTML;
-    });
-};
-
-
-
-
-const getID = (results) => {
-    results.data.forEach(result => {
-        console.log(result.album.id);
     });
 };
 
@@ -149,10 +160,10 @@ searchFormEl.addEventListener('submit', function(e) {
         });
     } else if (albumCheckboxEl.checked) {
         getUrl("https://deezerdevs-deezer.p.rapidapi.com/search/album?q=");
+        
         getMusic(url).then(renderAlbumResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
-        });
-        
+        }); 
     } else if (trackCheckboxEl.checked) {
         getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=track:");
         getMusic(url).then(renderTrackResults).catch(err => {
