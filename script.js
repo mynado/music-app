@@ -5,10 +5,12 @@
 const resultCardsEl = document.querySelector('#result-cards');
 const searchFormEl = document.querySelector('#search-form');
 const searchEl = document.querySelector('#search');
-const artistCheckboxEl = document.querySelector('#artist');
-const albumCheckboxEl = document.querySelector('#album');
-const trackCheckboxEl = document.querySelector('#track');
+const anyRadioEl = document.querySelector('#any');
+const artistRadioEl = document.querySelector('#artist');
+const albumRadioEl = document.querySelector('#album');
+const trackRadioEl = document.querySelector('#track');
 const tracklistEl = document.querySelector('#tracklist');
+
 
 
 // Get value from input field
@@ -16,11 +18,10 @@ let searchUrl;
 let url;
 let tracklistUrl;
 const getUrl = (checkedUrl) => {
-    console.log("checkedUrl", checkedUrl);
     searchUrl = checkedUrl;
-    url = searchUrl + searchEl.value; //.split('').join(' ') ifall jag vill lägga till dash mellan orden (-)
-    console.log("url", url)
+    url = searchUrl + searchEl.value.split('').join(''); //.split('').join(' ') ifall jag vill lägga till dash mellan orden (-)
 };
+
 
 
 const getMusic = async (url) => {
@@ -76,13 +77,13 @@ const renderArtistResults = (results) => {
     });
 };
 
+// Get tracklist url
 const getTracklistUrl = (checkedUrl) => {
     tracklistUrl = checkedUrl;
-    console.log("tracklistUrl", tracklistUrl)
 };
 
 const renderTracklist = (tracks) => {
-    tracks.data.forEach(track => {
+    tracks.data.forEach(track => {       
         const trackHTML = `
         <li>${track.title}</li>
         `;
@@ -90,8 +91,6 @@ const renderTracklist = (tracks) => {
         return tracklistEl.innerHTML += trackHTML;
     });
 };
-
-
 
 const renderAlbumResults = (results) => {
     
@@ -112,11 +111,8 @@ const renderAlbumResults = (results) => {
         resultCardsEl.innerHTML += resultHTML;
         getTracklistUrl("https://deezerdevs-deezer.p.rapidapi.com/album/" + result.id + "/tracks");
         getMusic(tracklistUrl).then(renderTracklist).catch(err => err);
-        
     });
 };
-
-
 
 
 const renderTrackResults = (results) => {
@@ -147,25 +143,25 @@ searchFormEl.addEventListener('submit', function(e) {
     url = searchUrl + searchEl.value;
     resultCardsEl.innerHTML = "";
     
-    // check if the checkbox are checked
-    if (albumCheckboxEl.checked && artistCheckboxEl.checked && trackCheckboxEl.checked) {
+    // which radio button is selected
+    if (anyRadioEl.checked) {
         getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=");
         getMusic(url).then(renderSearchResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         });
-    } else if (artistCheckboxEl.checked) {
+    } else if (artistRadioEl.checked) {
         getUrl("https://deezerdevs-deezer.p.rapidapi.com/search/artist?q=");
         getMusic(url).then(renderArtistResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         });
-    } else if (albumCheckboxEl.checked) {
+    } else if (albumRadioEl.checked) {
         getUrl("https://deezerdevs-deezer.p.rapidapi.com/search/album?q=");
-        
         getMusic(url).then(renderAlbumResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         }); 
-    } else if (trackCheckboxEl.checked) {
-        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search?q=track:");
+        
+    } else if (trackRadioEl.checked) {
+        getUrl("https://deezerdevs-deezer.p.rapidapi.com/search/track?q=");
         getMusic(url).then(renderTrackResults).catch(err => {
             alert("Error getting search result. Error was: " + err);
         });
