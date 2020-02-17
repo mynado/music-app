@@ -11,8 +11,6 @@ const albumRadioEl = document.querySelector('#album');
 const trackRadioEl = document.querySelector('#track');
 const tracklistEl = document.querySelector('#tracklist');
 
-
-
 // Get value from input field
 let searchUrl;
 let url;
@@ -21,8 +19,6 @@ const getUrl = (checkedUrl) => {
     searchUrl = checkedUrl;
     url = searchUrl + searchEl.value.split('').join(''); //.split('').join(' ') ifall jag vill lägga till dash mellan orden (-)
 };
-
-
 
 const getMusic = async (url) => {
     const response = await fetch(url, {
@@ -35,12 +31,10 @@ const getMusic = async (url) => {
     if (!response.ok) {
         throw new Error("Response was not OK.");
     } 
-   
     return await response.json();
 };
 
 const renderSearchResults = (results) => {
-
     results.data.forEach(result => {
         const resultHTML = `
             <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
@@ -50,7 +44,6 @@ const renderSearchResults = (results) => {
                         <h5 class="card-title">${result.title}</h5>
                         <h6>Artist: ${result.artist.name}</h6>
                         <h6>Album: ${result.album.title}</h6>
-                        
                     </div>
                 </div>
             </div>
@@ -77,23 +70,7 @@ const renderArtistResults = (results) => {
     });
 };
 
-// Get tracklist url
-const getTracklistUrl = (checkedUrl) => {
-    tracklistUrl = checkedUrl;
-};
-
-const renderTracklist = (tracks) => {
-    tracks.data.forEach(track => {       
-        const trackHTML = `
-        <li>${track.title}</li>
-        `;
-        console.log(trackHTML);
-        return tracklistEl.innerHTML += trackHTML;
-    });
-};
-
 const renderAlbumResults = (results) => {
-    
     results.data.forEach(result => {
         const resultHTML = `
             <div class="col-sm-12 col-md-6 col-lg-4 mt-3">
@@ -102,18 +79,14 @@ const renderAlbumResults = (results) => {
                     <div class="card-body">
                         <h5 class="card-title">${result.title}</h5>
                         <h6>Artist: ${result.artist.name}</h6>
-                        <h6>Tracklist: </h6>
-                        <ol id="tracklist"></ol>
                     </div>
                 </div>
             </div>
         `; 
         resultCardsEl.innerHTML += resultHTML;
-        getTracklistUrl("https://deezerdevs-deezer.p.rapidapi.com/album/" + result.id + "/tracks");
-        getMusic(tracklistUrl).then(renderTracklist).catch(err => err);
+
     });
 };
-
 
 const renderTrackResults = (results) => {
     results.data.forEach(result => {
